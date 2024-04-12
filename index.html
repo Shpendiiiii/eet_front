@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Portfolio</title>
+</head>
+<body>
+<div id="dataContainer">
+    <!-- Data will be displayed here -->
+</div>
+<div id="result">
+    <!-- Data will be displayed here -->
+</div>
+
+
+<h1>Portfolio Form</h1>
+
+<label for="investmentType">Select Investment Type:</label>
+<select id="investmentType">
+    <option value="stocks">Select an option</option>
+    <option value="stocks">Stocks</option>
+    <option value="mutualFunds">Mutual Funds</option>
+    <option value="bonds">Bonds</option>
+</select>
+
+<form id="portfolioForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required><br>
+
+    <label for="amount">Amount:</label>
+    <input type="number" id="amount" name="amount" required><br>
+
+    <label for="purchasePrice">Purchase Price:</label>
+    <input type="number" id="purchasePrice" name="purchasePrice" required><br>
+
+    <label for="purchaseDate">Purchase Date:</label>
+    <input type="date" id="purchaseDate" name="purchaseDate" required><br>
+
+    <label for="user_id">ID</label>
+    <input type="number" id="user_id" name="user_id" required><br>
+
+    <button type="submit">Submit</button>
+</form>
+</body>
+</html>
+
+<script>
+    // const form = document.getElementById('checkUserForm');
+    // const resultDiv = document.getElementById('result');
+
+    // form.addEventListener('submit', async (event) => {
+    //     event.preventDefault();
+    //     const formData = new FormData(form);
+    //     const username = formData.get('username');
+    //
+    //     try {
+    //         const response = await fetch(`http://127.0.0.1:5000/user/exist/${username}`);
+    //         const data = await response.json();
+    //         console.log(data)
+    //         resultDiv.textContent = `Welcome`
+    //         // resultDiv.textContent = `User exists: ${data}`;
+    //         if (data.exists){
+    //             form.parentNode.removeChild(form)
+    //             resultDiv
+    //         }
+    //     } catch (error) {
+    //         console.error('Error:', error);
+    //         resultDiv.textContent = 'An error occurred while checking user existence.';
+    //     }
+    // });
+
+    const investmentTypeSelect = document.getElementById('investmentType');
+    const portfolioForm = document.getElementById('portfolioForm');
+    const nameInput = document.getElementById('name');
+    const amountInput = parseInt(document.getElementById('amount'));
+    const purchasePriceInput = document.getElementById('purchasePrice');
+    const purchaseDateInput = document.getElementById('purchaseDate');
+    // const userId = document.getElementById('username').value;
+    let endpoint = '';
+
+    investmentTypeSelect.addEventListener('change', () => {
+        console.log("select")
+        const selectedOption = investmentTypeSelect.value;
+        switch (selectedOption) {
+            case 'stocks':
+                nameInput.placeholder = 'Stock Symbol';
+                endpoint = '/stocks';
+                console.log("mire je")
+                break;
+            case 'mutualFunds':
+                nameInput.placeholder = 'Fund Name';
+                endpoint = '/mutual_funds';
+                break;
+            case 'bonds':
+                nameInput.placeholder = 'Bond Name';
+                endpoint = '/bonds';
+                break;
+            default:
+                break;
+        }
+    });
+
+    portfolioForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const formData = new FormData(portfolioForm);
+        const data = Object.fromEntries(formData.entries());
+        console.log('Form data:', data);
+        try {
+            const response = await fetch(`http://localhost:5000${endpoint}`, {
+                method: 'POST',  // or 'PUT', 'DELETE' etc.
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+            const responseData = await response.json();
+            console.log('Response:', responseData);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+        // Send form data to backend using fetch or XMLHttpRequest
+    });
+
+</script>
