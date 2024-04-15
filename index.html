@@ -20,6 +20,10 @@
         th {
             background-color: #f2f2f2;
         }
+
+        #bondTable {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -36,9 +40,8 @@
 
 <label for="investmentType">Select Investment Type:</label>
 <select id="investmentType">
-    <option value="stocks">Select an option</option>
+    <option value="">Select an option</option>
     <option value="stocks">Stocks</option>
-    <option value="mutualFunds">Mutual Funds</option>
     <option value="bonds">Bonds</option>
 </select>
 
@@ -67,16 +70,36 @@
 
     <button type="submit">Submit</button>
 </form><br>
+<button id="clear">Clear</button>
 <div id="stocksData">
 
 </div>
+
 <table id="stockTable">
+    <caption>Stocks</caption>
     <thead>
     <tr>
         <th>Holding ID</th>
         <th>User ID</th>
         <th>Stock Symbol</th>
         <th>Shares</th>
+        <th>Purchase Price</th>
+        <th>Purchase Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Data will be dynamically inserted here -->
+    </tbody>
+</table>
+<!--<hr id="bondHr">-->
+<table id="bondTable">
+    <caption>Bonds</caption>
+    <thead>
+    <tr>
+        <th>Holding ID</th>
+        <th>User ID</th>
+        <th>Bond Name</th>
+        <th>Face Value</th>
         <th>Purchase Price</th>
         <th>Purchase Date</th>
     </tr>
@@ -168,6 +191,9 @@
     const dataForm = document.getElementById("getStocksData");
     const table = document.querySelector('#stockTable')
     const tableBody = document.querySelector('#stockTable tbody');
+    const bondTable = document.querySelector('#bondTable');
+    const bondBody = document.querySelector('#bondTable tbody')
+
 
 
     dataForm.addEventListener('submit', async (event) => {
@@ -197,10 +223,48 @@
                 tableBody.appendChild(row);
             });
             table.style.display = 'table';
+            table.style.marginBottom = "10px"
             console.log('Response: ', responseData);
+            const bondHr = document.createElement('hr');
+            bondHr.insertAdjacentElement('afterend', tableBody);
+        } catch (error){
+            console.error('There is an error: ', error);
+        }
+        try {
+            const response = await fetch(`${API}/bonds/${formData.get('user_id2')}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            const responseData = await response.json()
+            // results.textContent = responseData;
+            // console.log('Te dhenat', responseData)
+            responseData.forEach(entry => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+            <td>${entry.holding_id}</td>
+            <td>${entry.user_id}</td>
+            <td>${entry.bond_name}</td>
+            <td>${entry.face_value}</td>
+            <td>${entry.purchase_price}</td>
+            <td>${entry.purchase_date}</td>
+        `;
+                bondBody.appendChild(row);
+            });
+            bondTable.style.display = 'table';
         } catch (error){
             console.error('There is an error: ', error);
         }
     })
+
+    document.getElementById('clear').addEventListener('click', () => {
+        // Clear table data
+        bondBody.innerHTML = '';
+        // Hide the table
+        bondTable.style.display = 'none';
+        tableBody.innerHTML = '';
+        table.style.display = 'none';
+    });
 
 </script>
